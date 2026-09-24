@@ -1,0 +1,1457 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>我が家のストック</title>
+
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@400;500;700;800&display=swap');
+    html {
+  touch-action: pan-y;
+  overscroll-behavior-y: none;
+}
+
+body {
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  background: #FFF8E7;
+  margin: 0;
+  padding: 12px;
+  padding-bottom: 120px;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  touch-action: pan-y;
+}
+
+    h1 {
+      text-align: center;
+    }
+
+    h2 {
+  margin-top: 30px;
+  font-size: 20px;
+  white-space: nowrap;
+    }
+    .category-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 15px 0;
+}
+
+.category-buttons button {
+    padding: 14px 32px;
+border: none;
+border-radius: 30px;
+background: #e0e0e0;
+font-size: 17px;
+font-weight: 700;
+}
+
+.category-buttons button.active {
+  background: #d8f0d8;
+}
+#dailyButton.active {
+    background: #dceeff;
+}
+.lists-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+.list-column {
+    min-width: 0;
+}
+#addButton {
+    display: block;
+    margin: 10px auto 20px;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 25px;
+    background: #fff0c9;
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+}
+    .item {
+        background: white;
+padding: 8px 12px;
+margin: 8px 0;
+border-radius: 16px;
+box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      user-select: none;
+-webkit-user-select: none;
+-webkit-touch-callout: none;
+    }
+    .item-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    flex: 1;
+    min-width: 0;
+}
+
+.item button {
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+    button {
+      border: none;
+      border-radius: 20px;
+      padding: 5px 10px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .have {
+      background: #dff5df;
+    }
+
+    .buy {
+      background: #ffe0e0;
+    }
+    .action-menu {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 10px;
+  z-index: 1000;
+}
+
+.action-menu button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+}
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 72px;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  border-top: 1px solid #ddd;
+  z-index: 1000;
+}
+
+.bottom-nav button {
+  flex: 1;
+  height: 100%;
+  padding: 4px 0;
+  border: none;
+  border-radius: 0;
+  background: white;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 12px;
+}
+/* 価格比較画面 */
+#compareScreen {
+  padding-bottom: 190px;
+}
+
+#compareScreen h1 {
+  font-size: 28px;
+  margin: 15px 0 20px;
+}
+
+.compare-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.compare-card {
+  background: white;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+}
+
+.compare-card h2 {
+  background: #dfa05c;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 5px 4px;
+  font-size: 17px;
+}
+
+.compare-card label {
+  display: block;
+  background: #f8e8d8;
+  color: #806b5c;
+  margin: 4px 5px 0;
+  padding: 3px 5px;
+  font-size: 11px;
+}
+
+.compare-card input {
+  width: calc(100% - 10px);
+  box-sizing: border-box;
+  margin: 2px 5px 4px;
+  padding: 3px;
+  border: none;
+  background: white;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.compare-count {
+  display: flex;
+  width: 70%;
+  position: fixed;
+  left: 15%;
+  bottom: 90px;
+  margin: 0;
+  background: white;
+  border-radius: 30px;
+  overflow: hidden;
+  z-index: 900;
+}
+#compareResult:empty {
+  display: none;
+}
+
+#compareResult {
+  margin: 10px auto;
+  width: 88%;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 16px;
+  padding: 10px 12px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.25;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+#unitScreen {
+  padding-bottom: 120px;
+}
+
+#unitScreen h1 {
+  font-size: 28px;
+  text-align: center;
+  margin: 30px 0 35px;
+}
+
+.unit-card {
+  width: 90%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.unit-card label {
+  display: block;
+  background: #f8e8d8;
+  color: #806b5c;
+  margin: 12px 0 6px;
+  padding: 8px 12px;
+  font-size: 18px;
+  border-radius: 6px;
+}
+
+.unit-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  font-size: 22px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.unit-arrow {
+  text-align: center;
+  font-size: 30px;
+  margin: 15px 0;
+}
+
+.unit-result {
+  width: 90%;
+  max-width: 500px;
+  margin: 25px auto;
+}
+
+.unit-result .result-box {
+  background: white;
+  padding: 35px 20px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: 16px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.unit-result .result-box strong {
+  font-size: 38px;
+}
+.compare-count button {
+  flex: 1;
+  border-radius: 0;
+  padding: 10px;
+  background: white;
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.compare-count button.active {
+  background: #f8e8d8;
+}
+#discountScreen {
+  padding-bottom: 120px;
+}
+
+#discountScreen h1 {
+  font-size: 28px;
+  text-align: center;
+  margin: 30px 0 35px;
+}
+
+.discount-card {
+  width: 90%;
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-sizing: border-box;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+}
+
+.discount-card label {
+  display: block;
+  background: #f8e8d8;
+  color: #806b5c;
+  margin: 12px 0 6px;
+  padding: 8px 12px;
+  font-size: 18px;
+  border-radius: 6px;
+}
+
+.discount-card input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  font-size: 22px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.discount-arrow {
+  text-align: center;
+  font-size: 30px;
+  margin: 15px 0;
+}
+
+.discount-card p {
+  text-align: center;
+  font-size: 14px;
+  line-height: 1.6;
+  color: #806b5c;
+}
+#discountResult {
+  width: 90%;
+  max-width: 500px;
+  margin: 20px auto;
+  text-align: center;
+}
+#discountResult .result-box {
+  background: white;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.08);
+  text-align: center;
+}
+.result-box strong {
+  font-size: 36px;
+  color: #d00000;
+}
+.off-price {
+  color: #2196f3;
+}
+.calculator {
+  width: 95%;
+  margin: 0 auto;
+  padding-bottom: 20px;
+  margin-top: 150px;
+}
+
+.calculator-display {
+  background: #fff8e7;
+  font-size: 48px;
+  text-align: right;
+  padding: 20px;
+  box-sizing: border-box;
+  height: 100px;
+}
+
+.calculator-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: 80px;
+}
+
+.calculator-buttons button {
+  height: 60px;
+  font-size: 30px;
+  border: 1px solid white;
+}
+
+.calc-number {
+  background: #d9a875;
+  color: white;
+}
+
+.calc-light {
+  background: #eeeae2;
+  color: #8b6f5b;
+}
+
+.calc-operator {
+  background: #eeeae2;
+  color: #8b6f5b;
+}
+
+.calc-equal {
+  background: #d9a875;
+  color: white;
+}
+
+.calc-zero {
+  grid-column: span 2;
+}
+/* メモ画面 */
+#memoScreen {
+  padding-bottom: 100px;
+}
+
+#memoScreen h1 {
+  font-size: 28px;
+  text-align: center;
+  margin: 30px 0 25px;
+}
+
+.new-memo-button {
+  position: fixed;
+  right: 24px;
+  bottom: 90px;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  z-index: 1001;
+}
+#closeMemoButton {
+  position: fixed;
+  left: 24px;
+  top: 24px;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 32px;
+  font-weight: 400;
+  z-index: 1001;
+}
+
+#memoList {
+  width: 92%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.memo-item {
+  background: white;
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  border-radius: 12px;
+  border-bottom: 1px solid #eee;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.memo-title {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+
+.memo-preview {
+  font-size: 14px;
+  color: #555;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.memo-date {
+  margin-top: 7px;
+  font-size: 12px;
+  color: #999;
+}
+/* メモ入力画面 */
+#memoEditor {
+  width: 92%;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+#memoEditor h1 {
+  font-size: 28px;
+  text-align: center;
+  margin: 30px 0 25px;
+}
+
+#memoTitle {
+  width: 100%;
+  box-sizing: border-box;
+  border: none;
+  border-bottom: 1px solid #ddd;
+  background: transparent;
+  padding: 12px 4px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 22px;
+  font-weight: 700;
+  outline: none;
+}
+
+#memoBody {
+  width: 100%;
+  height: 500px;
+  box-sizing: border-box;
+  margin-top: 20px;
+  padding: 20px;
+  border: none;
+  border-radius: 16px;
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 17px;
+  line-height: 1.7;
+  resize: none;
+  outline: none;
+}
+
+#saveMemoButton {
+  display: block;
+  margin: 10px auto 30px;
+  padding: 11px 30px;
+  border: none;
+  border-radius: 25px;
+  background: #fff0c9;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+}
+/* 今あるCSS */
+
+.memo-item {
+  position: relative;
+  overflow: hidden;
+}
+
+.memo-delete-button {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 80px;
+  height: 100%;
+  border: none;
+  background: #ff3b30;
+  color: white;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 15px;
+  z-index: 0;
+  display: none;
+}
+
+.memo-content {
+  position: relative;
+  z-index: 1;
+  background: white;
+  transition: transform 0.2s ease;
+}
+
+#saveMemoButton {
+  position: fixed;
+  right: 24px;
+  top: 16px;
+  width: 58px;
+  height: 58px;
+  padding: 0;
+  border: 2px solid #333;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+  z-index: 1001;
+}
+#productModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.35);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.product-modal-box {
+  width: 85%;
+  max-width: 380px;
+  padding: 24px;
+  box-sizing: border-box;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+}
+
+.product-modal-box h2 {
+  margin: 0 0 20px;
+  text-align: center;
+  font-size: 22px;
+}
+
+#productNameInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 14px 16px;
+  border: 1px solid #ddd;
+  border-radius: 14px;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 16px;
+  outline: none;
+}
+
+.product-modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.product-modal-buttons button {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 12px;
+  background: #f2f2f2;
+  font-family: 'M PLUS Rounded 1c', sans-serif;
+  font-size: 15px;
+}
+  </style>
+</head>
+
+<body>
+
+    <img src="stock_header.png" alt="我が家のストック" style="width: 100%; height: auto; display: block;">
+
+  <div class="category-buttons">
+    <button id="foodButton" class="active">⚪ 食品</button>
+    <button id="dailyButton">⬜ 日用品</button>
+    
+  </div>
+  <button id="addButton" onclick="addItem()">＋ 食品を追加</button>
+  <div class="lists-container">
+
+    <div class="list-column">
+        <h2>🟢 ストックあり</h2>
+        <div id="haveList"></div>
+    </div>
+
+    <div class="list-column">
+        <h2>🔴 買うもの</h2>
+        <div id="buyList"></div>
+    </div>
+
+</div>
+<div id="compareScreen" style="display: none;">
+
+    <h1>価格の比較</h1>
+  
+    <div class="compare-cards" id="compareCards">
+  
+      <div class="compare-card">
+        <h2>商品A</h2>
+  
+        <label>価格</label>
+        <input type="number" id="priceA" placeholder="298">
+  
+        <label>重さ・長さ・個数・枚数</label>
+        <input type="number" id="amountA" placeholder="180">
+  
+        <label>1パックの入数</label>
+        <input type="number" id="packA" placeholder="5">
+      </div>
+  
+      <div class="compare-card">
+        <h2>商品B</h2>
+  
+        <label>価格</label>
+        <input type="number" id="priceB" placeholder="298">
+  
+        <label>重さ・長さ・個数・枚数</label>
+        <input type="number" id="amountB" placeholder="180">
+  
+        <label>1パックの入数</label>
+        <input type="number" id="packB" placeholder="5">
+      </div>
+      <div class="compare-card">
+        <h2>商品C</h2>
+      
+        <label>価格</label>
+        <input type="number" id="priceC" placeholder="298">
+      
+        <label>重さ・長さ・個数・枚数</label>
+        <input type="number" id="amountC" placeholder="180">
+      
+        <label>1パックの入数</label>
+        <input type="number" id="packC" placeholder="5">
+      </div>
+      <div class="compare-card">
+        <h2>商品D</h2>
+      
+        <label>価格</label>
+        <input type="number" id="priceD" placeholder="298">
+      
+        <label>重さ・長さ・個数・枚数</label>
+        <input type="number" id="amountD" placeholder="180">
+      
+        <label>1パックの入数</label>
+        <input type="number" id="packD" placeholder="5">
+      </div>
+  
+    </div>
+  
+    <div class="compare-count">
+      <button onclick="setCompareCount(2)">2</button>
+      <button onclick="setCompareCount(3)">3</button>
+      <button onclick="setCompareCount(4)">4</button>
+    </div>
+    <div id="compareResult"></div>
+  
+  </div>
+  
+  <!-- 単価計算画面 -->
+<div id="unitScreen" style="display: none;">
+
+  <h1>100gあたりの価格</h1>
+
+  <div class="unit-card">
+
+    <label>価格</label>
+    <input type="number" id="unitPrice" placeholder="598">
+
+    <label>重量</label>
+    <input type="number" id="unitAmount" placeholder="278">
+
+  </div>
+
+  <div class="unit-arrow">↓</div>
+
+  <div class="unit-result" id="unitResultBox" style="display: none;">
+    <div class="result-box">
+        <div>
+            100gあたり
+            <strong id="unitResultPrice">0円</strong>
+            です！
+        </div>
+    </div>
+</div>
+</div>
+<div id="discountScreen" style="display: none;">
+
+  <h1>割引額の計算</h1>
+
+  <div class="discount-card">
+
+    <label>価格</label>
+    <input type="number" id="discountPrice" placeholder="9800">
+
+    <div class="discount-arrow">↓</div>
+
+    <label>割引</label>
+    <input type="number" id="discountRate" placeholder="0.7">
+
+    <p>
+      1〜9%引を計算したい場合<br>
+      0.1〜0.9割引と入力してください
+    </p>
+
+  </div>
+
+  <div id="discountResult" style="display: none;">
+    <div class="result-title">ß</div>
+  </div>
+
+</div>
+<div id="calculatorScreen" style="display: none;">
+
+  <h1>電卓</h1>
+
+  <div class="calculator">
+
+    <div class="calculator-display" id="calculatorDisplay">
+    </div>
+    
+
+    <div class="calculator-buttons">
+
+      <button class="calc-light" onclick="deleteLast()">⌫</button>
+      <button class="calc-light" onclick="clearCalculator()">AC</button>
+      <button class="calc-light" onclick="calculatePercent()">%</button>
+      <button class="calc-operator" onclick="calculatorInput('÷')">÷</button>
+
+      <button class="calc-number" onclick="calculatorInput('7')">7</button>
+      <button class="calc-number" onclick="calculatorInput('8')">8</button>
+      <button class="calc-number" onclick="calculatorInput('9')">9</button>
+      <button class="calc-operator" onclick="calculatorInput('×')">×</button>
+
+      <button class="calc-number" onclick="calculatorInput('4')">4</button>
+      <button class="calc-number" onclick="calculatorInput('5')">5</button>
+      <button class="calc-number" onclick="calculatorInput('6')">6</button>
+      <button class="calc-operator" onclick="calculatorInput('-')">−</button>
+
+      <button class="calc-number" onclick="calculatorInput('1')">1</button>
+      <button class="calc-number" onclick="calculatorInput('2')">2</button>
+      <button class="calc-number" onclick="calculatorInput('3')">3</button>
+      <button class="calc-operator" onclick="calculatorInput('+')">＋</button>
+
+      <button class="calc-number calc-zero" onclick="calculatorInput('0')">0</button>
+      <button class="calc-number" onclick="calculatorInput('.')">.</button>
+      <button class="calc-equal" onclick="calculateResult()">＝</button>
+
+    </div>
+
+  </div>
+
+</div>
+</div>
+<!-- メモ画面 -->
+<div id="memoScreen" style="display: none;">
+
+  <h1>メモ</h1>
+
+  <button class="new-memo-button" onclick="openNewMemo()">＋</button>
+
+  <div id="memoEditor" style="display: none;">
+  
+    <textarea
+      id="memoBody"
+      placeholder="メモを入力"
+      ></textarea>
+
+    <button id="saveMemoButton" onclick="closeMemo()">✓</button>
+    
+    <button id="closeMemoButton" onclick="closeMemo()">←</button>
+  </div>
+
+  <div id="memoList">
+
+  </div>
+
+</div>
+<div id="productModal" style="display: none;">
+  <div class="product-modal-box">
+
+    <h2 id="productModalTitle">商品を追加</h2>
+
+    <input
+      type="text"
+      id="productNameInput"
+      placeholder="商品名を入力"
+    >
+
+    <div class="product-modal-buttons">
+      <button onclick="closeProductModal()">キャンセル</button>
+      <button onclick="confirmProductModal()">追加</button>
+    </div>
+
+  </div>
+</div>
+  <script>
+  
+  let items = JSON.parse(localStorage.getItem("stockItems")) || [];
+  let currentCategory = "food";
+  let editingMemoIndex = -1;
+  let editingItemIndex = -1;
+  let memoItems = JSON.parse(localStorage.getItem("memoItems")) || [];
+  function showCompare() {
+  document.querySelector("body > img").style.display = "none";
+  document.querySelector(".category-buttons").style.display = "none";
+  document.getElementById("addButton").style.display = "none";
+  document.querySelector(".lists-container").style.display = "none";
+  document.getElementById("compareScreen").style.display = "block";
+  document.getElementById("discountScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "none";
+  document.getElementById("calculatorScreen").style.display = "none";
+  document.getElementById("memoScreen").style.display = "none";
+}
+
+function showStock() {
+  document.querySelector("body > img").style.display = "block";
+  document.querySelector(".category-buttons").style.display = "flex";
+  document.getElementById("addButton").style.display = "block";
+  document.querySelector(".lists-container").style.display = "grid";
+  document.getElementById("compareScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "none";
+  document.getElementById("discountScreen").style.display = "none";
+  document.getElementById("calculatorScreen").style.display = "none";
+  document.getElementById("memoScreen").style.display = "none";
+  displayItems();
+}　
+function showUnit() {
+  document.querySelector("body > img").style.display = "none";
+  document.querySelector(".category-buttons").style.display = "none";
+  document.getElementById("addButton").style.display = "none";
+  document.querySelector(".lists-container").style.display = "none";
+  document.getElementById("compareScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "block";
+  document.getElementById("discountScreen").style.display = "none";
+  document.getElementById("calculatorScreen").style.display = "none";
+  document.getElementById("memoScreen").style.display = "none";
+}
+function showDiscount() {
+  document.querySelector("body > img").style.display = "none";
+  document.querySelector(".category-buttons").style.display = "none";
+  document.getElementById("addButton").style.display = "none";
+  document.querySelector(".lists-container").style.display = "none";
+  document.getElementById("compareScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "none";
+  document.getElementById("discountScreen").style.display = "block";
+  document.getElementById("calculatorScreen").style.display = "none";
+  document.getElementById("memoScreen").style.display = "none";
+}
+function showCalculator() {
+  document.querySelector("body > img").style.display = "none";
+  document.querySelector(".category-buttons").style.display = "none";
+  document.getElementById("addButton").style.display = "none";
+  document.querySelector(".lists-container").style.display = "none";
+  document.getElementById("compareScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "none";
+  document.getElementById("discountScreen").style.display = "none";
+  document.getElementById("calculatorScreen").style.display = "block";
+  document.getElementById("memoScreen").style.display = "none";
+}
+function showMemo() {
+  document.querySelector("body > img").style.display = "none";
+  document.querySelector(".category-buttons").style.display = "none";
+  document.getElementById("addButton").style.display = "none";
+  document.querySelector(".lists-container").style.display = "none";
+  document.getElementById("compareScreen").style.display = "none";
+  document.getElementById("unitScreen").style.display = "none";
+  document.getElementById("discountScreen").style.display = "none";
+  document.getElementById("calculatorScreen").style.display = "none";
+  document.getElementById("memoScreen").style.display = "block";
+  displayMemos();
+}
+function displayMemos() {
+  document.getElementById("memoList").innerHTML =
+    memoItems.map((memo, index) =>
+      '<div class="memo-item" onclick="openEditMemo(' + index + ')" onmousedown="startLongPress(' + index + ')" onmouseup="cancelLongPress()" ontouchstart="startLongPress(' + index + '); startSwipe(event)" ontouchend="cancelLongPress(); endSwipe(event)">' +
+      '<button class="memo-delete-button" onclick="event.stopPropagation(); deleteMemo(' + index + ')">削除</button>' +
+      '<div class="memo-content">' +
+      '<div class="memo-preview">' + memo.text + '</div>' +
+      '<div class="memo-date">' + memo.time + '</div>' +
+      '</div>' +
+      '</div>'
+    ).join("");
+}
+let longPressTimer;
+
+function startLongPress(index) {
+  longPressTimer = setTimeout(() => {
+
+    const menu = document.createElement("div");
+    menu.id = "memoActionMenu";
+
+    menu.style.position = "fixed";
+    menu.style.left = "50%";
+    menu.style.top = "50%";
+    menu.style.transform = "translate(-50%, -50%)";
+    menu.style.background = "white";
+    menu.style.borderRadius = "16px";
+    menu.style.boxShadow = "0 4px 20px rgba(0,0,0,0.2)";
+    menu.style.zIndex = "2000";
+    menu.style.overflow = "hidden";
+
+    menu.innerHTML = `
+      <button style="display:block; width:180px; padding:16px; border:none; background:white; font-size:16px;"
+        onclick="openEditMemo(${index}); this.parentElement.remove();">
+        編集
+      </button>
+
+      <button style="display:block; width:180px; padding:16px; border:none; border-top:1px solid #eee; background:white; color:#ff3b30; font-size:16px;"
+        onclick="deleteMemo(${index}); this.parentElement.remove();">
+        削除
+      </button>
+    `;
+
+    document.body.appendChild(menu);
+
+  }, 700);
+}
+document.addEventListener("click", function(event) {
+  const menu = document.getElementById("memoActionMenu");
+
+  if (menu && !menu.contains(event.target)) {
+    menu.remove();
+  }
+});
+
+function cancelLongPress() {
+  clearTimeout(longPressTimer);
+}
+function deleteMemo(index) {
+  memoItems.splice(index, 1);
+  localStorage.setItem("memoItems", JSON.stringify(memoItems));
+  displayMemos();
+}
+let swipeStartX = 0;
+
+function startSwipe(event) {
+  swipeStartX = event.touches[0].clientX;
+}
+
+function endSwipe(event) {
+  const swipeEndX = event.changedTouches[0].clientX;
+  const swipeDistance = swipeEndX - swipeStartX;
+
+  const memoItem = event.currentTarget;
+  const memoContent = memoItem.querySelector(".memo-content");
+  const deleteButton = memoItem.querySelector(".memo-delete-button");
+
+  if (swipeDistance < -80) {
+    if (memoContent.style.transform === "translateX(-80px)") {
+      const memoIndex = Array.from(document.querySelectorAll(".memo-item")).indexOf(memoItem);
+      deleteMemo(memoIndex);
+    } else {
+      memoContent.style.transform = "translateX(-80px)";
+      deleteButton.style.display = "block";
+    }
+  } else if (swipeDistance > 80) {
+    memoContent.style.transform = "translateX(0)";
+    deleteButton.style.display = "none";
+  }
+}
+
+document.addEventListener("click", function(event) {
+  if (!event.target.closest(".memo-item")) {
+    document.querySelectorAll(".memo-content").forEach(function(content) {
+      content.style.transform = "translateX(0)";
+    });
+
+    document.querySelectorAll(".memo-delete-button").forEach(function(button) {
+      button.style.display = "none";
+    });
+  }
+});
+function openNewMemo() {
+  editingMemoIndex = -1;
+
+  document.getElementById("memoList").style.display = "none";
+  document.querySelector(".new-memo-button").style.display = "none";
+  document.getElementById("memoEditor").style.display = "block";
+
+  document.getElementById("memoBody").value = "";
+}
+function closeMemo() {
+ 
+  const memoText = document.getElementById("memoBody").value.trim();
+  if (memoText === "") {
+  document.getElementById("memoEditor").style.display = "none";
+  document.getElementById("memoList").style.display = "block";
+  document.querySelector(".new-memo-button").style.display = "block";
+  return;
+}
+  
+  const memoTime = new Date().toLocaleString("ja-JP");
+
+if (editingMemoIndex === -1) {
+  memoItems.push({
+    text: memoText,
+    time: memoTime
+  });
+} else {
+  const updatedMemo = {
+    text: memoText,
+    time: memoTime
+  };
+
+  memoItems.splice(editingMemoIndex, 1);
+  memoItems.unshift(updatedMemo);
+}
+
+localStorage.setItem("memoItems", JSON.stringify(memoItems));
+displayMemos();
+
+  document.getElementById("memoEditor").style.display = "none";
+  document.getElementById("memoList").style.display = "block";
+  document.querySelector(".new-memo-button").style.display = "block";
+}
+function openEditMemo(index = 0) {
+  editingMemoIndex = index;
+
+  document.getElementById("memoList").style.display = "none";
+  document.querySelector(".new-memo-button").style.display = "none";
+  document.getElementById("memoEditor").style.display = "block";
+
+  document.getElementById("memoBody").value =
+  memoItems[index]?.text || "";
+}
+function addItem() {
+  document.getElementById("productModal").style.display = "flex";
+  document.getElementById("productModalTitle").textContent = "商品を追加";
+  document.getElementById("productNameInput").value = "";
+  document.getElementById("productNameInput").focus();
+}
+function confirmProductModal() {
+  const name = document.getElementById("productNameInput").value.trim();
+
+  if (!name) {
+    return;
+  }
+
+  if (editingItemIndex === -1) {
+    items.push({
+      name: name,
+      have: true,
+      category: currentCategory
+    });
+  } else {
+    items[editingItemIndex].name = name;
+  }
+
+  localStorage.setItem("stockItems", JSON.stringify(items));
+  displayItems();
+
+  document.getElementById("productModal").style.display = "none";
+  editingItemIndex = -1;
+}
+function closeProductModal() {
+  document.getElementById("productModal").style.display = "none";
+  editingItemIndex = -1;
+}
+window.calculatorInput = function(value) {
+  const display = document.getElementById("calculatorDisplay");
+
+  if (display.textContent === "0") {
+    display.textContent = value;
+  } else {
+    display.textContent += value;
+  }
+};
+function calculateResult() {
+  const expression = document.getElementById("calculatorDisplay").textContent.replace(/×/g, "*").replace(/÷/g, "/");
+  const result = eval(expression);
+  document.getElementById("calculatorDisplay").textContent = result;
+}
+function clearCalculator() {
+  document.getElementById("calculatorDisplay").textContent = "0";
+}
+function calculatePercent() {
+  const display = document.getElementById("calculatorDisplay");
+  const value = Number(display.textContent);
+  display.textContent = value / 100;
+}
+function deleteLast() {
+  const display = document.getElementById("calculatorDisplay");
+  display.textContent = display.textContent.slice(0, -1);
+}
+const foodButton = document.getElementById("foodButton");
+const dailyButton = document.getElementById("dailyButton");
+const addButton = document.getElementById("addButton");
+
+foodButton.onclick = () => {
+  currentCategory = "food";
+  foodButton.classList.add("active");
+  dailyButton.classList.remove("active");
+  addButton.textContent = "＋ 食品を追加";
+  displayItems();
+};
+
+dailyButton.onclick = () => {
+  currentCategory = "daily";
+  dailyButton.classList.add("active");
+  foodButton.classList.remove("active");
+  addButton.textContent = "＋ 日用品を追加";
+  displayItems();
+};  
+
+    function displayItems() {
+  const haveList = document.getElementById("haveList");
+  const buyList = document.getElementById("buyList");
+
+  haveList.innerHTML = "";
+  buyList.innerHTML = "";
+
+  items.forEach((item, index) => {
+    if (item.category !== currentCategory) return;
+    const div = document.createElement("div");
+    div.className = "item";
+
+   // 長押し処理（スクロール時はタイマーをキャンセルする）
+let pressTimer;
+
+// タッチ開始（タイマーセット）
+div.addEventListener("touchstart", () => {
+  pressTimer = setTimeout(() => {
+
+    const menu = document.createElement("div");
+    menu.className = "action-menu";
+
+    const editButton = document.createElement("button");
+    editButton.textContent = "編集";
+
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "削除";
+
+    editButton.onclick = () => {
+      editingItemIndex = index;
+
+      document.getElementById("productModal").style.display = "flex";
+      document.getElementById("productModalTitle").textContent = "商品を編集";
+      document.getElementById("productNameInput").value = item.name;
+      document.getElementById("productNameInput").focus();
+    };
+
+    deleteButton.onclick = () => {
+      if (confirm(`${item.name}を削除しますか？`)) {
+        items.splice(index, 1);
+        localStorage.setItem("stockItems", JSON.stringify(items));
+        displayItems();
+      }
+
+      menu.remove();
+    };
+
+    menu.appendChild(editButton);
+    menu.appendChild(deleteButton);
+    document.body.appendChild(menu);
+
+    document.addEventListener("touchstart", function closeMenu(event) {
+      if (!menu.contains(event.target) && event.target !== div) {
+        menu.remove();
+        document.removeEventListener("touchstart", closeMenu);
+      }
+    });
+
+  }, 700);
+}, { passive: true });
+
+// 指を動かした（スクロールした）ら長押しをキャンセル
+div.addEventListener("touchmove", () => {
+  clearTimeout(pressTimer);
+}, { passive: true });
+
+// 指を離した・キャンセルされたらタイマー解除
+div.addEventListener("touchend", () => clearTimeout(pressTimer));
+div.addEventListener("touchcancel", () => clearTimeout(pressTimer));
+
+
+
+    const button = document.createElement("button");
+
+    if (item.have) {
+      div.classList.add("have");
+      button.textContent = "🛒 買う";
+
+      button.onclick = () => {
+        items[index].have = false;
+        localStorage.setItem("stockItems", JSON.stringify(items));
+        displayItems();
+      };
+
+      div.innerHTML = `<span class="item-name">${item.name}</span>`;
+      div.appendChild(button);
+      haveList.appendChild(div);
+
+    } else {
+      div.classList.add("buy");
+      button.textContent = "🛍️ 買った";
+
+      button.onclick = () => {
+        items[index].have = true;
+        localStorage.setItem("stockItems", JSON.stringify(items));
+        displayItems();
+      };
+
+      div.innerHTML = `<span class="item-name">${item.name}</span>`;
+      div.appendChild(button);
+      buyList.appendChild(div);
+    }
+  });
+}
+displayItems();
+  function calculateCompare() {
+  const products = ["A", "B", "C", "D"];
+  const results = [];
+
+  products.forEach(name => {
+    const price = Number(document.getElementById("price" + name)?.value);
+    const amount = Number(document.getElementById("amount" + name)?.value);
+    const pack = Number(document.getElementById("pack" + name)?.value);
+
+    if (price > 0 && amount > 0 && pack > 0) {
+      const totalAmount = amount * pack;
+      const unitPrice = price / totalAmount;
+
+      results.push({
+        name: name,
+        price: price,
+        totalAmount: totalAmount,
+        unitPrice: unitPrice
+      });
+    }
+  });
+
+  const resultArea = document.getElementById("compareResult");
+
+  if (results.length < 2) {
+    resultArea.innerHTML = "";
+    return;
+  }
+
+  results.sort((a, b) => a.unitPrice - b.unitPrice);
+
+  const winner = results[0];
+  const second = results[1];
+
+  const savings = Math.round(
+    second.unitPrice * winner.totalAmount - winner.price
+  );
+
+  resultArea.innerHTML = `
+  <div>
+    <strong>商品${winner.name}が一番お得！</strong>
+    <br>
+    <strong>${savings}円分節約できます</strong>
+    <br>
+    （商品${second.name}と同じ量で比較）
+    <br>
+    ${results.map(product =>
+      `商品${product.name}：1単位あたり ${product.unitPrice.toFixed(3)}円`
+    ).join("<br>")}
+  </div>
+`;
+}
+["A", "B", "C", "D"].forEach(name => {
+  document.getElementById("price" + name).addEventListener("input", calculateCompare);
+  document.getElementById("amount" + name).addEventListener("input", calculateCompare);
+  document.getElementById("pack" + name).addEventListener("input", calculateCompare);
+});
+function setCompareCount(count) {
+    const countButtons = document.querySelectorAll(".compare-count button");
+
+countButtons.forEach(button => {
+  button.classList.remove("active");
+});
+
+countButtons[count - 2].classList.add("active");
+  const cards = document.querySelectorAll(".compare-card");
+
+  cards.forEach((card, index) => {
+    const countButtons = document.querySelectorAll(".compare-count button");
+    if (index < count) {
+      card.style.display = "block";
+    } else {
+      card.style.display = "none";
+    }
+  });
+}
+setCompareCount(2);
+calculateCompare();
+function calculateUnit() {
+  const price = Number(document.getElementById("unitPrice").value);
+  const amount = Number(document.getElementById("unitAmount").value);
+  const resultBox = document.getElementById("unitResultBox");
+  const resultPrice = document.getElementById("unitResultPrice");
+
+  if (!price || !amount) {
+    resultBox.style.display = "none";
+    return;
+  }
+
+  const unitPrice = (price / amount) * 100;
+
+  resultPrice.textContent = Math.round(unitPrice) + "円";
+  resultBox.style.display = "block";
+}
+function calculateDiscount() {
+  const price = Number(document.getElementById("discountPrice").value);
+  const rate = Number(document.getElementById("discountRate").value);
+
+  if (!price || !rate) {
+    return;
+  }
+
+  const discountPrice = price * rate;
+  const finalPrice = price - discountPrice;
+
+const resultBox = document.getElementById("discountResult");
+
+const offPrice = price - finalPrice;
+
+resultBox.innerHTML = `
+  <div class="result-box">
+    割引後は <strong>${Math.round(finalPrice)}円</strong> です！<br>
+    <span class="off-price">${Math.round(offPrice)}円OFF</span>
+  </div>
+`;
+
+resultBox.style.display = "block";
+}
+document.getElementById("discountPrice").addEventListener("input", calculateDiscount);
+document.getElementById("discountRate").addEventListener("input", calculateDiscount);
+
+
+document.getElementById("unitPrice").addEventListener("input", calculateUnit);
+
+document.getElementById("unitAmount").addEventListener("input", calculateUnit);
+  </script>
+  
+    <nav class="bottom-nav">
+      <button onclick="showStock()">ストック</button>
+      <button onclick="showCompare()">比較</button>
+      <button onclick="showUnit()">単価</button>
+      <button onclick="showDiscount()">%計算</button>
+      <button onclick="showCalculator()">電卓</button>
+      <button onclick="showMemo()">メモ</button>
+    </nav>
+  
+  </body>
+  </html>
